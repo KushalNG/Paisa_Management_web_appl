@@ -25,6 +25,38 @@ const Login = () => {
     setLoading(true);
     setError('');
 
+    // Default admin account (for testing without backend)
+    if (formData.phone === 'admin' && formData.password === 'admin@123') {
+      const mockAdminUser = {
+        id: 'admin-1',
+        fullName: 'Admin User',
+        phone: 'admin',
+        email: 'admin@paisa.com',
+        role: 'admin',
+        walletBalance: 100000,
+      };
+      const mockToken = 'mock-jwt-token-admin-' + Date.now();
+      login(mockToken, mockAdminUser);
+      navigate('/');
+      return;
+    }
+
+    // Default regular user account (for testing without backend)
+    if (formData.phone === 'user' && formData.password === 'user@123') {
+      const mockRegularUser = {
+        id: 'user-1',
+        fullName: 'Regular User',
+        phone: 'user',
+        email: 'user@paisa.com',
+        role: 'user',
+        walletBalance: 50000,
+      };
+      const mockToken = 'mock-jwt-token-user-' + Date.now();
+      login(mockToken, mockRegularUser);
+      navigate('/');
+      return;
+    }
+
     try {
       const response = await authAPI.login(formData);
       const { token, user } = response.data;
@@ -56,6 +88,24 @@ const Login = () => {
           </div>
         )}
 
+        {/* Default Credentials Info Box */}
+        <div className="mb-4 p-4 bg-blue-50 border border-blue-300 rounded-lg">
+          <p className="text-sm font-semibold text-blue-800 mb-2">🔑 Default Test Accounts:</p>
+          <div className="space-y-1 text-xs text-blue-700">
+            <div className="flex justify-between items-center bg-white p-2 rounded">
+              <span className="font-medium">Admin Account:</span>
+              <span className="font-mono">admin / admin@123</span>
+            </div>
+            <div className="flex justify-between items-center bg-white p-2 rounded">
+              <span className="font-medium">Regular User:</span>
+              <span className="font-mono">user / user@123</span>
+            </div>
+          </div>
+          <p className="text-xs text-blue-600 mt-2 italic">
+            * Use these credentials to test without backend
+          </p>
+        </div>
+
         {/* Login Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -63,14 +113,13 @@ const Login = () => {
               Phone Number
             </label>
             <input
-              type="tel"
+              type="text"
               name="phone"
               value={formData.phone}
               onChange={handleChange}
               required
-              pattern="[0-9]{10}"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="9876543210"
+              placeholder="9876543210 or 'admin'"
               data-testid="phone-input"
             />
           </div>
