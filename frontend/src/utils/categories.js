@@ -37,3 +37,49 @@ export const getCategoryColor = (category) => {
   };
   return colors[category] || '#999999';
 };
+
+// Category Management Functions
+const CUSTOM_CATEGORIES_KEY = 'paisa_custom_categories';
+
+export const getCustomCategories = () => {
+  try {
+    const stored = localStorage.getItem(CUSTOM_CATEGORIES_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch (error) {
+    console.error('Error loading custom categories:', error);
+    return [];
+  }
+};
+
+export const getAllCategories = () => {
+  const customCategories = getCustomCategories();
+  return [...DEFAULT_CATEGORIES, ...customCategories];
+};
+
+export const addCustomCategory = (categoryName) => {
+  if (!categoryName || typeof categoryName !== 'string') {
+    throw new Error('Category name must be a non-empty string');
+  }
+
+  const trimmedName = categoryName.trim();
+  if (!trimmedName) {
+    throw new Error('Category name cannot be empty');
+  }
+
+  const allCategories = getAllCategories();
+  if (allCategories.includes(trimmedName)) {
+    throw new Error('Category already exists');
+  }
+
+  const customCategories = getCustomCategories();
+  customCategories.push(trimmedName);
+  localStorage.setItem(CUSTOM_CATEGORIES_KEY, JSON.stringify(customCategories));
+  
+  return trimmedName;
+};
+
+export const removeCustomCategory = (categoryName) => {
+  const customCategories = getCustomCategories();
+  const filtered = customCategories.filter(cat => cat !== categoryName);
+  localStorage.setItem(CUSTOM_CATEGORIES_KEY, JSON.stringify(filtered));
+};

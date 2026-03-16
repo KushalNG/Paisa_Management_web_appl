@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import { transactionAPI } from '@/services/api';
 import { formatCurrency, formatDate, exportToCSV } from '@/utils/exportUtils';
-import { DEFAULT_CATEGORIES } from '@/utils/categories';
+import { getAllCategories, addCustomCategory } from '@/utils/categories';
 import { Plus, X, Download, Filter, TrendingDown, TrendingUp } from 'lucide-react';
 
 const Transactions = () => {
@@ -12,7 +12,7 @@ const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
   const [filteredTransactions, setFilteredTransactions] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [categories, setCategories] = useState([...DEFAULT_CATEGORIES]);
+  const [categories, setCategories] = useState([]);
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [newCategory, setNewCategory] = useState('');
 
@@ -44,7 +44,12 @@ const Transactions = () => {
 
   useEffect(() => {
     fetchTransactions();
+    loadCategories();
   }, []);
+
+  const loadCategories = () => {
+    setCategories(getAllCategories());
+  };
 
   useEffect(() => {
     applyFilters();
@@ -124,11 +129,16 @@ const Transactions = () => {
   };
 
   const handleAddCategory = () => {
-    if (newCategory && !categories.includes(newCategory)) {
-      setCategories([...categories, newCategory]);
-      setFormData({ ...formData, category: newCategory });
-      setNewCategory('');
-      setShowAddCategory(false);
+    if (newCategory && newCategory.trim()) {
+      try {
+        const added = addCustomCategory(newCategory.trim());
+        loadCategories();
+        setFormData({ ...formData, category: added });
+        setNewCategory('');
+        setShowAddCategory(false);
+      } catch (error) {
+        alert(error.message);
+      }
     }
   };
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import { dashboardAPI } from '@/services/api';
 import { formatCurrency, getBudgetColor } from '@/utils/exportUtils';
-import { DEFAULT_CATEGORIES } from '@/utils/categories';
+import { getAllCategories } from '@/utils/categories';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Plus, Edit2, Save, X, PiggyBank, TrendingDown, AlertCircle, CheckCircle } from 'lucide-react';
 
@@ -119,7 +119,7 @@ const BudgetManagement = () => {
 
   const getAvailableCategories = () => {
     const usedCategories = budgets.map(b => b.category);
-    return DEFAULT_CATEGORIES.filter(cat => !usedCategories.includes(cat));
+    return getAllCategories().filter(cat => !usedCategories.includes(cat));
   };
 
   const calculateTotalBudget = () => {
