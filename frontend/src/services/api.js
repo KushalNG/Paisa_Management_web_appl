@@ -71,6 +71,14 @@ export const dashboardAPI = {
   getBudgets: () => api.get('/api/dashboard/budgets'),
 };
 
+// Budget APIs
+export const budgetAPI = {
+  getAll: (params) => api.get('/api/budgets', { params }),
+  create: (data) => api.post('/api/budgets', data),
+  update: (id, data) => api.put(`/api/budgets/${id}`, data),
+  delete: (id) => api.delete(`/api/budgets/${id}`),
+};
+
 // Admin APIs
 export const adminAPI = {
   getUsers: () => api.get('/api/admin/users'),

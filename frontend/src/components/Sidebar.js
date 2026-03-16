@@ -9,6 +9,7 @@ import {
   Users,
   LogOut,
   Wallet,
+  PiggyBank,
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -22,6 +23,7 @@ const Sidebar = () => {
 
   const navItems = [
     { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
+    { path: '/budgets', icon: PiggyBank, label: 'Budget Management' },
     { path: '/transactions', icon: Receipt, label: 'Transactions' },
     { path: '/commitments', icon: Calendar, label: 'Commitments' },
     { path: '/profile', icon: User, label: 'Profile' },

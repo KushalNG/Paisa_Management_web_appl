@@ -8,6 +8,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import Register from '@/pages/Register';
 import Login from '@/pages/Login';
 import Dashboard from '@/pages/Dashboard';
+import BudgetManagement from '@/pages/BudgetManagement';
 import Transactions from '@/pages/Transactions';
 import Commitments from '@/pages/Commitments';
 import Profile from '@/pages/Profile';
@@ -28,6 +29,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/budgets"
+            element={
+              <ProtectedRoute>
+                <BudgetManagement />
               </ProtectedRoute>
             }
           />
