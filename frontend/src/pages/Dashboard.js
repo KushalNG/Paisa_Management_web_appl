@@ -13,7 +13,7 @@ const Dashboard = () => {
     totalIncome: 0,
     totalExpense: 0,
     categoryExpenses: [],
-    trends: [],
+    categoryComparison: [],
     budgets: [],
     upcomingCommitments: [],
     exceededBudgets: [],
@@ -42,16 +42,24 @@ const Dashboard = () => {
           { category: 'Entertainment', amount: 4500 },
           { category: 'Bills & Utilities', amount: 7769.50 },
         ],
-        trends: [
-          { month: 'Jan', 'Food & Dining': 12000, Transportation: 8000, Shopping: 7000 },
-          { month: 'Feb', 'Food & Dining': 11500, Transportation: 8500, Shopping: 6500 },
-          { month: 'Mar', 'Food & Dining': 12500, Transportation: 8500, Shopping: 6500 },
+        // Clustered data: Categories with Budget vs Actual comparison
+        categoryComparison: [
+          { category: 'Food & Dining', Budget: 15000, Actual: 12500 },
+          { category: 'Transportation', Budget: 10000, Actual: 8500 },
+          { category: 'Shopping', Budget: 5000, Actual: 6500 },
+          { category: 'Entertainment', Budget: 5000, Actual: 4500 },
+          { category: 'Bills & Utilities', Budget: 8000, Actual: 7769.50 },
         ],
         budgets: [
+          // Budget calculation: User sets budget amount per category (e.g., 15000 for Food)
+          // Spent is calculated by summing all transactions in that category for current month
+          // Percentage = (spent / budget) * 100
+          // Colors: Green (<70%), Yellow (70-89%), Red (≥90%)
           { category: 'Food & Dining', budget: 15000, spent: 12500 },
           { category: 'Transportation', budget: 10000, spent: 8500 },
           { category: 'Shopping', budget: 5000, spent: 6500 },
           { category: 'Entertainment', budget: 5000, spent: 4500 },
+          { category: 'Bills & Utilities', budget: 8000, spent: 7769.50 },
         ],
         upcomingCommitments: [
           { name: 'Car EMI', amount: 15000, dueDate: '2025-03-15' },
@@ -202,36 +210,74 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Trend Line Chart */}
+        {/* Budget vs Actual - Clustered Bar Chart */}
         <div className="bg-white rounded-xl shadow-md p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Expense Trends</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={stats.trends}>
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold text-gray-800">Budget vs Actual Spending</h3>
+            <p className="text-sm text-gray-600 mt-1">Compare your budget allocation with actual spending by category</p>
+          </div>
+          <ResponsiveContainer width="100%" height={350}>
+            <BarChart data={stats.categoryComparison} barGap={8}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
+              <XAxis 
+                dataKey="category" 
+                angle={-45} 
+                textAnchor="end" 
+                height={120} 
+                fontSize={12}
+                interval={0}
+              />
               <YAxis />
               <Tooltip formatter={(value) => formatCurrency(value)} />
               <Legend />
-              <Line type="monotone" dataKey="Food & Dining" stroke="#FF6384" strokeWidth={2} />
-              <Line type="monotone" dataKey="Transportation" stroke="#36A2EB" strokeWidth={2} />
-              <Line type="monotone" dataKey="Shopping" stroke="#FFCE56" strokeWidth={2} />
-            </LineChart>
+              <Bar dataKey="Budget" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="Actual" fill="#10b981" radius={[4, 4, 0, 0]} />
+            </BarChart>
           </ResponsiveContainer>
+          <div className="mt-4 flex items-center justify-center gap-6 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-blue-600 rounded"></div>
+              <span className="text-gray-700">Budget (Planned)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-green-600 rounded"></div>
+              <span className="text-gray-700">Actual (Spent)</span>
+            </div>
+          </div>
         </div>
 
-        {/* Budget Progress Bars */}
+        {/* Budget Progress Bars with Explanation */}
         <div className="bg-white rounded-xl shadow-md p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Budget Progress</h3>
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold text-gray-800">Budget Progress Tracker</h3>
+            <div className="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
+              <p className="text-xs text-gray-700 font-semibold mb-1">📊 How Budgets Work:</p>
+              <ul className="text-xs text-gray-600 space-y-1 ml-4 list-disc">
+                <li><strong>Budget Amount:</strong> Maximum spending limit you set for each category per month</li>
+                <li><strong>Spent Amount:</strong> Sum of all transactions in that category for current month</li>
+                <li><strong>Percentage:</strong> (Spent ÷ Budget) × 100</li>
+                <li><strong>Colors:</strong> 🟢 Green (&lt;70%) | 🟡 Yellow (70-89%) | 🔴 Red (≥90%)</li>
+              </ul>
+            </div>
+          </div>
           <div className="space-y-4">
             {stats.budgets.map((budget, idx) => {
               const percentage = (budget.spent / budget.budget) * 100;
+              const isOverBudget = percentage > 100;
               return (
                 <div key={idx} data-testid={`budget-${budget.category}`}>
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium text-gray-700">{budget.category}</span>
-                    <span className={`text-sm font-semibold ${getBudgetColor(percentage)}`}>
-                      {formatCurrency(budget.spent)} / {formatCurrency(budget.budget)} ({percentage.toFixed(0)}%)
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-sm font-semibold ${getBudgetColor(percentage)}`}>
+                        {formatCurrency(budget.spent)} / {formatCurrency(budget.budget)} ({percentage.toFixed(0)}%)
+                      </span>
+                      {isOverBudget && (
+                        <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full font-semibold">
+                          Over Budget!
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-3">
                     <div
@@ -241,6 +287,11 @@ const Dashboard = () => {
                       style={{ width: `${Math.min(percentage, 100)}%` }}
                     ></div>
                   </div>
+                  {isOverBudget && (
+                    <p className="text-xs text-red-600 mt-1">
+                      Exceeded by {formatCurrency(budget.spent - budget.budget)}
+                    </p>
+                  )}
                 </div>
               );
             })}

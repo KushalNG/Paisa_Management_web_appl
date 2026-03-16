@@ -29,6 +29,14 @@ This file tracks all errors encountered during development and their fixes.
   - Regular user account: `user` / `user@123`
 - Updated Login page with credentials info box
 - Modified phone input to accept text (for "admin" and "user")
+- **Replaced Line Chart with Clustered Bar Chart** on Dashboard
+  - Removed: Expense trends line chart
+  - Added: Budget vs Actual clustered bar chart (better comparison)
+- **Enhanced Budget Display:**
+  - Added explanation box about how budgets work
+  - Added "Over Budget!" badges for exceeded categories
+  - Shows excess amount when over budget
+  - Improved visual clarity
 - No breaking changes to existing functionality
 
 ### Minor Warnings (Non-Critical):
