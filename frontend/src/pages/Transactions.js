@@ -144,32 +144,22 @@ const Transactions = () => {
 
   const handleExport = async () => {
     try {
-      let dataToExport = filteredTransactions;
+      const params = {};
+      if (exportOptions.startDate) params.startDate = exportOptions.startDate;
+      if (exportOptions.endDate) params.endDate = exportOptions.endDate;
+      if (exportOptions.category) params.category = exportOptions.category;
+      params.format = 'csv';
 
-      if (exportOptions.startDate) {
-        dataToExport = dataToExport.filter(t => new Date(t.date) >= new Date(exportOptions.startDate));
-      }
-      if (exportOptions.endDate) {
-        dataToExport = dataToExport.filter(t => new Date(t.date) <= new Date(exportOptions.endDate));
-      }
-      if (exportOptions.category) {
-        dataToExport = dataToExport.filter(t => t.category === exportOptions.category || t.reason === exportOptions.category);
-      }
-
-      const exportData = dataToExport.map(t => ({
-        Date: formatDate(t.date),
-        Type: t.type,
-        Category: t.category || t.reason || '-',
-        Amount: t.amount,
-        Description: t.description || '-',
-      }));
-
-      if (exportOptions.format === 'csv') {
-        exportToCSV(exportData, 'transactions.csv');
-      } else {
-        // For PDF, we'll just download as CSV for now (backend can handle PDF generation)
-        alert('PDF export will be handled by backend');
-      }
+      const response = await transactionAPI.export(params);
+      const blob = new Blob([response.data], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'transactions.csv';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
 
       setShowExportModal(false);
     } catch (error) {
@@ -524,26 +514,9 @@ const Transactions = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Format</label>
                 <div className="flex gap-3">
-                  <button
-                    onClick={() => setExportOptions({ ...exportOptions, format: 'csv' })}
-                    className={`flex-1 py-2 rounded-lg font-semibold transition-colors ${
-                      exportOptions.format === 'csv'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
-                  >
+                  <div className="flex-1 py-2 rounded-lg font-semibold bg-blue-600 text-white text-center">
                     CSV
-                  </button>
-                  <button
-                    onClick={() => setExportOptions({ ...exportOptions, format: 'pdf' })}
-                    className={`flex-1 py-2 rounded-lg font-semibold transition-colors ${
-                      exportOptions.format === 'pdf'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
-                  >
-                    PDF
-                  </button>
+                  </div>
                 </div>
               </div>
 

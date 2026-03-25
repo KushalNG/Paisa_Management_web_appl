@@ -252,6 +252,12 @@ const Commitments = () => {
                       <Calendar className="w-4 h-4" />
                       <span>Next deduction: {formatDate(nextDeduction)}</span>
                     </div>
+                    {commitment.lastDeductedAt && (
+                      <div className="flex items-center gap-2 text-gray-700">
+                        <Calendar className="w-4 h-4" />
+                        <span>Last deducted: {formatDate(commitment.lastDeductedAt)}</span>
+                      </div>
+                    )}
                     {remainingMonths !== null && (
                       <div className="flex items-center gap-2 text-gray-700">
                         <span className="font-semibold">{remainingMonths} months remaining</span>

@@ -8,6 +8,9 @@ import { getCategoryColor } from '@/utils/categories';
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(true);
+  const [selectedMonth, setSelectedMonth] = useState(() => new Date().toISOString().slice(0, 7));
+  const [monthRange, setMonthRange] = useState({ start: '', end: '' });
+  const [filterMode, setFilterMode] = useState('current'); // current | single | range
   const [stats, setStats] = useState({
     walletBalance: 0,
     totalIncome: 0,
@@ -18,12 +21,28 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchDashboardData();
-  }, []);
+  }, [selectedMonth, monthRange, filterMode]);
 
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const response = await dashboardAPI.getStats();
+      const params = {};
+      const currentMonth = new Date().toISOString().slice(0, 7);
+      if (filterMode === 'range' && (monthRange.start || monthRange.end)) {
+        if (monthRange.start) {
+          params.startDate = `${monthRange.start}-01`;
+        }
+        if (monthRange.end) {
+          const [y, m] = monthRange.end.split('-').map(Number);
+          const lastDay = new Date(y, m, 0).getDate();
+          params.endDate = `${monthRange.end}-${String(lastDay).padStart(2, '0')}`;
+        }
+      } else if (filterMode === 'single') {
+        params.month = selectedMonth || currentMonth;
+      } else {
+        params.month = currentMonth;
+      }
+      const response = await dashboardAPI.getStats(params);
       setStats(response.data);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
@@ -66,6 +85,62 @@ const Dashboard = () => {
         <div>
           <h1 className="text-3xl font-bold text-gray-800" data-testid="dashboard-title">Dashboard</h1>
           <p className="text-gray-600">Overview of your financial status</p>
+        </div>
+
+        {/* Filters */}
+        <div className="bg-white rounded-xl shadow-md p-4 flex flex-col gap-4 md:flex-row md:items-end">
+          <div className="flex flex-col">
+            <label className="text-sm text-gray-700">Filter Mode</label>
+            <select
+              value={filterMode}
+              onChange={(e) => {
+                const value = e.target.value;
+                setFilterMode(value);
+                if (value !== 'range') setMonthRange({ start: '', end: '' });
+                if (value === 'current') setSelectedMonth(new Date().toISOString().slice(0, 7));
+              }}
+              className="px-3 py-2 border border-gray-300 rounded-lg"
+            >
+              <option value="current">Current Month</option>
+              <option value="single">Single Month</option>
+              <option value="range">Month Range</option>
+            </select>
+          </div>
+
+          {filterMode === 'single' && (
+            <div className="flex flex-col">
+              <label className="text-sm text-gray-700">Month</label>
+              <input
+                type="month"
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-lg"
+              />
+            </div>
+          )}
+
+          {filterMode === 'range' && (
+            <>
+              <div className="flex flex-col">
+                <label className="text-sm text-gray-700">Start Month</label>
+                <input
+                  type="month"
+                  value={monthRange.start}
+                  onChange={(e) => setMonthRange({ ...monthRange, start: e.target.value })}
+                  className="px-3 py-2 border border-gray-300 rounded-lg"
+                />
+              </div>
+              <div className="flex flex-col">
+                <label className="text-sm text-gray-700">End Month</label>
+                <input
+                  type="month"
+                  value={monthRange.end}
+                  onChange={(e) => setMonthRange({ ...monthRange, end: e.target.value })}
+                  className="px-3 py-2 border border-gray-300 rounded-lg"
+                />
+              </div>
+            </>
+          )}
         </div>
 
         {/* Commitment Reminder Banner */}

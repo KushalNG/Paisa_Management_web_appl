@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// API Base URL - will use LAN IP
+// API Base URL - will use env or localhost
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const api = axios.create({
@@ -65,10 +65,10 @@ export const commitmentAPI = {
 
 // Dashboard APIs
 export const dashboardAPI = {
-  getStats: () => api.get('/api/dashboard/stats'),
+  getStats: (params) => api.get('/api/dashboard/stats', { params }),
   getCategoryExpenses: () => api.get('/api/dashboard/category-expenses'),
   getTrends: () => api.get('/api/dashboard/trends'),
-  getBudgets: () => api.get('/api/dashboard/budgets'),
+  getBudgets: (params) => api.get('/api/dashboard/budgets', { params }),
 };
 
 // Budget APIs

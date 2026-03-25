@@ -34,9 +34,8 @@ const Register = () => {
         startingBalance: parseFloat(formData.startingBalance) || 0,
       });
 
-      const { token, user } = response.data;
-      login(token, user);
-      navigate('/');
+      // After successful registration, redirect to login (no auto-login)
+      navigate('/login');
     } catch (err) {
       if (err.response?.status === 409) {
         setError('Phone number already exists. Please use a different number.');
@@ -70,15 +69,17 @@ const Register = () => {
         {/* Registration Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="register-fullname" className="block text-sm font-medium text-gray-700 mb-1">
               Full Name *
             </label>
             <input
+              id="register-fullname"
               type="text"
               name="fullName"
               value={formData.fullName}
               onChange={handleChange}
               required
+              autoComplete="name"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="John Doe"
               data-testid="fullname-input"
@@ -86,16 +87,18 @@ const Register = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="register-phone" className="block text-sm font-medium text-gray-700 mb-1">
               Phone Number *
             </label>
             <input
+              id="register-phone"
               type="tel"
               name="phone"
               value={formData.phone}
               onChange={handleChange}
               required
               pattern="[0-9]{10}"
+              autoComplete="tel"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="9876543210"
               data-testid="phone-input"
@@ -104,15 +107,17 @@ const Register = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="register-email" className="block text-sm font-medium text-gray-700 mb-1">
               Email *
             </label>
             <input
+              id="register-email"
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
               required
+              autoComplete="email"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="john@example.com"
               data-testid="email-input"
@@ -120,17 +125,19 @@ const Register = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="register-password" className="block text-sm font-medium text-gray-700 mb-1">
               Password *
             </label>
             <div className="relative">
               <input
+                id="register-password"
                 type={showPassword ? 'text' : 'password'}
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
                 required
                 minLength="6"
+                autoComplete="new-password"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="••••••••"
                 data-testid="password-input"
@@ -147,16 +154,18 @@ const Register = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="register-balance" className="block text-sm font-medium text-gray-700 mb-1">
               Starting Balance (₹)
             </label>
             <input
+              id="register-balance"
               type="number"
               name="startingBalance"
               value={formData.startingBalance}
               onChange={handleChange}
               min="0"
               step="0.01"
+              autoComplete="off"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="0.00"
               data-testid="balance-input"
